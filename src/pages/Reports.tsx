@@ -22,7 +22,7 @@ export const Reports = () => {
     }, {} as Record<string, number>);
 
     return (
-        <div className="p-8">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">Sales Dashboard</h1>
                 <p className="text-gray-500 mt-1">Overview of today's store performance</p>
@@ -68,13 +68,14 @@ export const Reports = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                            <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                                 <h2 className="font-bold text-gray-900">Recent Transactions</h2>
+                                <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">Last 10</span>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
+                            <div className="overflow-x-auto custom-scrollbar">
+                                <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                         <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-100">
                                             <th className="py-3 px-4 font-medium">Txn ID</th>

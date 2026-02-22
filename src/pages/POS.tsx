@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, ShoppingCart, Minus, Plus as PlusIcon, Trash2, Tag, CreditCard } from 'lucide-react';
+import { Search, ShoppingCart, Minus, Plus as PlusIcon, Trash2, Tag, CreditCard, X } from 'lucide-react';
 import type { Product, Variant } from '../types/models';
 import type { CartItem } from '../types/sales';
 import { getProducts } from '../api/inventory';
@@ -12,6 +12,7 @@ export const POS = () => {
     const [discountAmount, setDiscountAmount] = useState<number>(0);
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
+    const [isMobileCartOpen, setIsMobileCartOpen] = useState<boolean>(false);
 
     useEffect(() => {
         setProducts(getProducts());
@@ -77,9 +78,9 @@ export const POS = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden print:h-auto print:overflow-visible print:block">
+        <div className="flex h-[calc(100vh-73px)] lg:h-screen bg-gray-50 overflow-hidden print:h-auto print:overflow-visible print:block relative">
             {/* Left Area: Products */}
-            <div className="flex-1 flex flex-col h-full border-r border-gray-200 print:hidden">
+            <div className="flex-1 flex flex-col h-full lg:border-r border-gray-200 print:hidden overflow-hidden">
                 <div className="p-4 bg-white border-b border-gray-200">
                     <div className="relative mb-4">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -154,14 +155,30 @@ export const POS = () => {
                 </div>
             </div>
 
+            {/* Mobile Cart Toggle Backdrop */}
+            {isMobileCartOpen && (
+                <div
+                    className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+                    onClick={() => setIsMobileCartOpen(false)}
+                />
+            )}
+
             {/* Right Area: Cart Flow */}
-            <div className="w-96 bg-white flex flex-col shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)] z-10 print:hidden">
+            <div className={`
+                fixed lg:static top-0 right-0 h-full w-[85vw] sm:w-96 bg-white flex flex-col shadow-2xl lg:shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)] z-50 print:hidden transition-transform duration-300 ease-in-out
+                ${isMobileCartOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+            `}>
                 <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                     <div className="flex items-center gap-2 text-gray-900 font-bold text-lg">
                         <ShoppingCart size={22} className="text-blue-600" />
                         <span>Current Order</span>
                     </div>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">{cart.length} items</span>
+                    <div className="flex items-center gap-3">
+                        <span className="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">{cart.length} items</span>
+                        <button onClick={() => setIsMobileCartOpen(false)} className="lg:hidden p-1 text-gray-400 hover:text-gray-900">
+                            <X size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
@@ -260,6 +277,27 @@ export const POS = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Mobile Floating Cart Button */}
+            {!isMobileCartOpen && cart.length > 0 && (
+                <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-sm">
+                    <button
+                        onClick={() => setIsMobileCartOpen(true)}
+                        className="w-full bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-500/30 p-4 flex items-center justify-between transition-transform active:scale-95"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <ShoppingCart size={24} />
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-blue-600">
+                                    {cart.length}
+                                </span>
+                            </div>
+                            <span className="font-bold">View Cart</span>
+                        </div>
+                        <span className="font-bold text-lg">₹{total.toFixed(2)}</span>
+                    </button>
+                </div>
+            )}
 
             {isCheckoutOpen && (
                 <CheckoutModal
